@@ -24,7 +24,7 @@ I employ the Transformer which was introduced in the paper [Attention Is All You
   * `eval.py` is for evaluation and inference.
 
 ## Training
-* STEP 1. Download and extract [Leipzig English News 1M Corpus](http://wortschatz.uni-leipzig.de/en/download).
+* STEP 1. Download and extract [Leipzig English News 2015 1M Corpus](http://wortschatz.uni-leipzig.de/en/download).
 * STEP 2. Adjust hyper parameters in `hyperparams.py` if necessary.
 * STEP 3. Run `train.py` or download the [pretrained files](https://www.dropbox.com/s/5axxz6f9g93ms72/logdir.zip?dl=0).
 
