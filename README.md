@@ -1,5 +1,7 @@
 # Word Ordering: Can Neural Networks Put a Scramble of Words in Correct Order?
 
+**I've found some critical bugs. Now I'm working on debugging.**
+
 When learning a second language, one of the hardest challenges is likely to be familiar with the word order. Word order can be also important in machine translation because translation is, roughly speaking, a process that one arranges words of target language which are equivalent to source language in order. Probably you've done a word scramble game where you are to put shuffled words or letters in the original order. I think it's quite fun to see if neural networks can do it. Okay. Can you order the following words correctly?
 
 **can translation machine order also important be word in**
