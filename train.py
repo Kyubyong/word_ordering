@@ -20,7 +20,11 @@ class Graph():
         self.graph = tf.Graph()
         is_training = mode=="train"
         with self.graph.as_default():
-            self.x, self.y, self.num_batch = get_batch_data(mode=mode) # (N, T)
+            if is_training:
+                self.x, self.y, self.num_batch = get_batch_data() # (N, T)
+            else:  # inference
+                self.x = tf.placeholder(tf.int32, shape=(None, hp.maxlen))
+                self.y = tf.placeholder(tf.int32, shape=(None, hp.maxlen))
 
             # define decoder inputs
             self.decoder_inputs = tf.concat((tf.zeros_like(self.y[:, :1]), self.y[:, :-1]), -1)
@@ -116,6 +120,7 @@ class Graph():
                 
             # Final linear projection
             self.logits = tf.layers.dense(self.dec, len(self.word2idx))
+            self.logprob = tf.nn.softmax(self.logits)
             self.preds = tf.to_int32(tf.argmax(self.logits, axis=-1))
             self.istarget = tf.to_float(tf.not_equal(self.y, 0))
             self.acc = tf.reduce_sum(tf.to_float(tf.equal(self.preds, self.y))*self.istarget)/ (tf.reduce_sum(self.istarget))

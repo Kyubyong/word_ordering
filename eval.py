@@ -20,10 +20,22 @@ import distance
 import glob
 from tqdm import tqdm
 
+np.random.seed(0)
 def eval(): 
     # Load graph
     g = Graph(mode="test")
     print("Graph loaded")
+
+    # Load batch
+    _Y = load_data(mode="test")
+
+    X = np.zeros((len(_Y), hp.maxlen))
+    Y = np.zeros((len(_Y), hp.maxlen))
+    for i, y in enumerate(_Y):
+        y = np.fromstring(y, np.int32)
+        Y[i][:len(y)] = y
+        np.random.shuffle(y)
+        X[i][:len(y)] = y
 
     word2idx, idx2word = g.word2idx, g.idx2word
      
@@ -41,9 +53,17 @@ def eval():
             if not os.path.exists('results'): os.mkdir('results')
             with codecs.open("results/" + mname, "w", "utf-8") as fout:
                 num_words, total_edit_distance = 0, 0
-                for step in tqdm(range(g.num_batch), total=g.num_batch, ncols=70, leave=False, unit='b'):
-                    if sv.should_stop(): break
-                    x, y, preds = sess.run([g.x, g.y, g.preds])
+                for i in range(0, len(Y), hp.batch_size):
+                    ### Get mini-batches
+                    x = X[i:i+hp.batch_size]
+                    y = Y[i:i+hp.batch_size]
+
+                    ### Autoregressive inference
+                    preds = np.zeros((hp.batch_size, hp.maxlen), np.int32)
+                    for j in range(hp.maxlen):
+                        _preds = sess.run(g.preds, {g.x: x, g.y: preds})
+                        preds[:, j] = _preds[:, j]
+
                     for xx, yy, pred in zip(x, y, preds):  # sentence-wise
                         inputs = " ".join(idx2word[idx] for idx in xx).replace("_", "").strip()
                         expected = " ".join(idx2word[idx] for idx in yy).replace("_", "").strip()

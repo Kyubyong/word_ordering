@@ -68,32 +68,33 @@ def load_data(mode="train"):
     print("# Y =", len(Y))
     return Y
 
-def get_batch_data(mode="train"):
-    # Load data
-    Y = load_data(mode=mode)
+def get_batch_data():
+    with tf.device("/cpu:0"):
+        # Load data
+        Y = load_data(mode="train")
 
-    # calc total batch count
-    num_batch = len(Y) // hp.batch_size
+        # calc total batch count
+        num_batch = len(Y) // hp.batch_size
 
-    # Convert to tensor
-    Y = tf.convert_to_tensor(Y)
+        # Convert to tensor
+        Y = tf.convert_to_tensor(Y)
 
-    # Create Queues
-    y, = tf.train.slice_input_producer([Y,], shuffle=mode=="train")
+        # Create Queues
+        y, = tf.train.slice_input_producer([Y,])
 
-    # Restore to int32
-    y = tf.decode_raw(y, tf.int32)
+        # Restore to int32
+        y = tf.decode_raw(y, tf.int32)
 
-    # Random generate inputs
-    x = tf.random_shuffle(y)
+        # Random generate inputs
+        x = tf.random_shuffle(y)
 
-    # create batch queues
-    x, y = tf.train.batch([x, y],
-                          num_threads=8,
-                          batch_size=hp.batch_size,
-                          capacity=hp.batch_size * 64,
-                          allow_smaller_final_batch=False,
-                        dynamic_pad=True)
+        # create batch queues
+        x, y = tf.train.batch([x, y],
+                              num_threads=8,
+                              batch_size=hp.batch_size,
+                              capacity=hp.batch_size * 64,
+                              allow_smaller_final_batch=False,
+                            dynamic_pad=True)
 
     return x, y, num_batch  # (N, T), ()
 #
